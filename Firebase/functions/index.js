@@ -32,15 +32,26 @@ app.get("/", (req, res) => {
 
 // Create ->  post()
 app.post("/api/create", (req, res) => {
-  console.log("res")(async () => {
+  (async () => {
     try {
-      await db.collection("userDetails").doc(`/${Date.now()}/`).create({
+      const empData = {
         id: Date.now(),
         name: req.body.name,
         mobile: req.body.mobile,
-        address: req.body.address,
-      });
-      return res.status(200).send({ success: true, message: "Data Saved" });
+        address: req.body.address
+      }
+      const data = await db
+        .collection("userDetails")
+        .doc(`/${Date.now()}/`)
+        .create({
+          id: empData.id,
+          name: empData.name,
+          mobile: empData.mobile,
+          address: empData.address,
+        });
+      return res
+        .status(200)
+        .send({ success: true, message: "Data Saved", data:empData });
     } catch (error) {
       console.log(error);
       return res.status(500).send({ success: false, message: error });
@@ -78,6 +89,7 @@ app.get("/api/getAll", (req, res) => {
 
         docs.map((doc) => {
           const selectedItem = {
+            id: doc.data().id,
             name: doc.data().name,
             mobile: doc.data().mobile,
             address: doc.data().address,
@@ -197,7 +209,6 @@ app.post("/api/sendNotification", (req, res) => {
   });
 });
 
-
 app.post("/api/dynamiclink", async (req, res) => {
   try {
     // APP
@@ -208,8 +219,7 @@ app.post("/api/dynamiclink", async (req, res) => {
       longDynamicLink: `https://dlfirebase.page.link/?link=${req.body.longlink}`,
     });
     return res
-      .send({ shortLink: shortLink, previewLink: previewLink })
-      .statusCode(200);
+      .send({ shortLink: shortLink, previewLink: previewLink });
   } catch (err) {
     console.error(err);
     return res
@@ -217,7 +227,7 @@ app.post("/api/dynamiclink", async (req, res) => {
         success: false,
         message: err,
       })
-      .statusCode(400);
+      ;
   }
 });
 exports.app = functions.https.onRequest(app);

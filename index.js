@@ -24,7 +24,9 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     .file(fileName)
     .createWriteStream()
     .end(req.file.buffer);
-  res.send("done");
+    res
+    .status(200)
+    .send({ success: true, message: "picture_added_successfully", data: {} });
 });
 
 app.listen(3000, () => {
